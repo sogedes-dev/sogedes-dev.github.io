@@ -1,0 +1,75 @@
+<?xml version="1.0"  encoding="iso-8859-1" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:simpleType name="LookupState">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Ok"/>
+            <xs:enumeration value="Error"/>
+            <xs:enumeration value="Warning"/>
+            <xs:enumeration value="None"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="LookupEnum" abstract="true">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="state" type="LookupState" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="Undefined">
+        <xs:complexContent>
+            <xs:extension base="LookupEnum"/>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="SingleInt">
+        <xs:complexContent>
+            <xs:extension base="LookupEnum">
+                <xs:attribute name="value" type="xs:integer" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="BitField">
+        <xs:complexContent>
+            <xs:extension base="LookupEnum">
+                <xs:attribute name="value" type="xs:integer" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="Range">
+        <xs:complexContent>
+            <xs:extension base="LookupEnum">
+                <xs:attribute name="from" type="xs:integer" use="required"/>
+                <xs:attribute name="to" type="xs:integer" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="Boolean">
+        <xs:sequence>
+            <xs:element name="True" type="SingleInt"/>
+            <xs:element name="False" type="SingleInt"/>
+            <xs:element name="Undefined" type="Undefined" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:simpleType name="ident">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[a-zA-Z.]+"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:element name="ValueLookup">
+        <xs:complexType>
+            <xs:all>
+                <xs:element name="Lookups" minOccurs="1" maxOccurs="1">
+                    <xs:complexType>
+                        <xs:choice>
+                            <xs:element name="SingleInt" minOccurs="1" maxOccurs="unbounded" type="SingleInt" />
+                            <xs:element name="BitField" minOccurs="1" maxOccurs="unbounded" type="BitField" />
+                            <xs:element name="Range" minOccurs="1" maxOccurs="unbounded" type="Range" />
+                            <xs:element name="Boolean" minOccurs="1" maxOccurs="1" type="Boolean" />
+                        </xs:choice>
+                    </xs:complexType>
+                </xs:element>
+            </xs:all>
+            <xs:attribute name="id" type="ident" use="required"/>
+            <xs:attribute name="desiredValue" type="xs:integer" use="required"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
